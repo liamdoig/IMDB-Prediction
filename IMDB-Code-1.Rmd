@@ -1,0 +1,280 @@
+---
+title: "Midterm"
+output: html_notebook
+---
+Step 1: First we want import the IMDB Data from the csv & attach it to make it easier to work with
+
+```{r}
+imdb = read.csv("data_final.csv")
+attach(imdb)
+```
+
+Step 2: Get a better look at the data overall
+```{r}
+head(imdb)
+str(imdb) 
+#We can see that the data is made up of integers, factors and a dummy variable for genre. Nice!
+#We also have NA values that we need to deal with
+```
+Step 3: Since we are going to be predcting english blockbuster movies in NA, we filter our data for only english language
+```{r}
+library(dplyr)
+imdb = imdb %>% 
+  filter(language == "English",
+         country %in% c("USA", "Germany", "Sweden","Denmark", "UK"))
+```
+
+Step 4: We can remove some unecessary columns, movie_id, language, country, movie_imdb_link, plot_keywords, color, genres, plot summary, x-x.11
+```{r}
+imdb = imdb[,-c(5,8,9,15,28,29,31,35,58:70)]
+```
+
+Step 5: Lets loook at a summary of our data to see what we have in each column. We can see that we have a bunch of NA values so were going to have to deal with those.
+```{r}
+summary(imdb)
+
+```
+We have NA Values in:
+distributor = 9
+director = 3
+production_company = 9
+director_facebook_likes = 25 
+actor_1_star_meter = 6 #dont need
+critic_reviews_number = 10 
+number_of_faces_in_movie_poster = 7 
+movie_budget = 95 #removed them
+ratio_movie_cast_likes = 3 
+number_of_votes = 23
+
+
+Step 6: Deal with Na Values
+```{r}
+#1 distributor - googled values
+imdb$distributor = as.character(imdb$distributor)
+distibutor <- subset(imdb, is.na(distributor))
+distibutor
+
+imdb$distributor[71] = "Paramount Pictures"
+imdb$distributor[189] = "United Artists"
+imdb$distributor[226] = "Sony Pictures"
+imdb$distributor[428] = "Universal Pictures"
+imdb$distributor[754] = "Shochiku Co., Ltd."
+imdb$distributor[2108] = "Paramount Pictures"
+imdb$distributor[2304] = "Columbia Pictures"
+imdb$distributor[2419] = "Relativity Media"
+imdb$distributor[2821] = "Magnolia Pictures"
+imdb = imdb[-c(2809), ]
+
+attach(imdb)
+any(is.na(imdb$distributor))
+
+#2 director - googled values
+imdb$director = as.character(imdb$director)
+directors = subset(imdb, is.na(director))
+directors
+imdb$director[194] = "Peter Deluise"
+imdb$director[325] = "Tibor Takics"
+imdb$director[1863] = "Mark Steven Johnson" # this one was the date was also in 2003 not 2015
+
+attach(imdb)
+any(is.na(imdb$director))
+
+# 3 prodcution_company - googled values
+imdb$production_company = as.character(imdb$production_company)
+productionCompany = subset(imdb, is.na(production_company))
+imdb$production_company[71] = "Indian Paintbrush"
+imdb$production_company[189] = "Selznick International Pictures"
+imdb$production_company[226] = "UK Film Council"
+imdb$production_company[428] = "Blinding Edge Pictures"
+imdb$production_company[754] = " Recorded Picture Company"
+imdb$production_company[2108] = "Lakeshore Entertainment"
+imdb$production_company[2304] = "Columbia Pictures"
+imdb$production_company[2419] = "Relativity Media"
+imdb$production_company[2820] = "Darkcastle Entertainment"
+imdb$production_company[2821] = "Groundswell Productions"
+
+attach(imdb)
+any(is.na(imdb$production_company))
+
+#actor_1_star_meter
+imdb$actor_1_star_meter = as.numeric(imdb$actor_1_star_meter)
+actor1star = subset(imdb, is.na(imdb$actor_1_star_meter))
+imdb$actor_1_star_meter[390] = 2209
+imdb$actor_1_star_meter[585] = 5368
+imdb$actor_1_star_meter[592] = 5368
+imdb$actor_1_star_meter[1322] = 2209
+imdb$actor_1_star_meter[1768] = 2209
+imdb$actor_1_star_meter[1884] = 5368
+imdb$actor_1_star_meter[2071] = 5368
+imdb$actor_1_star_meter[2252] = 5368
+
+attach(imdb)
+any(is.na(actor_1_star_meter))
+
+#number_of_faces_in_movie_poster
+imdb$number_of_faces_in_movie_poster = as.numeric(imdb$number_of_faces_in_movie_poster)
+faces = subset(imdb, is.na(number_of_faces_in_movie_poster))
+imdb$number_of_faces_in_movie_poster[244] = 1
+imdb$number_of_faces_in_movie_poster[428] = 0
+imdb$number_of_faces_in_movie_poster[467] = 6
+imdb$number_of_faces_in_movie_poster[832] = 1
+imdb$number_of_faces_in_movie_poster[1417] = 2
+imdb$number_of_faces_in_movie_poster[2589] = 4
+imdb$number_of_faces_in_movie_poster[2673] = 1
+
+attach(imdb)
+any(is.na(number_of_faces_in_movie_poster))
+
+#movie_budget
+imdb$movie_budget = as.numeric(imdb$movie_budget)
+budget = subset(imdb, is.na(movie_budget))
+imdb = imdb[-c(which(is.na(imdb$movie_budget))),]
+
+attach(imdb)
+any(is.na(movie_budget))
+
+#ratio_movie_cast_likes
+imdb$ratio_movie_cast_likes = as.numeric(imdb$ratio_movie_cast_likes)
+ratio = subset(imdb, is.na(ratio_movie_cast_likes))
+imdb[ ,"ratio_movie_cast_likes"][is.na(imdb[ ,"ratio_movie_cast_likes"] ) ] = 0 
+
+attach(imdb)
+any(is.na(ratio_movie_cast_likes))
+
+#number_of_votes
+imdb$number_of_votes = as.numeric(imdb$number_of_votes)
+numberofvotes = subset(imdb, is.na(number_of_votes))
+imdb$number_of_votes[8] = 6788
+imdb$number_of_votes[71] = 54489
+imdb$number_of_votes[109] = 747
+imdb$number_of_votes[172] = 2878
+imdb$number_of_votes[189] = 0
+imdb$number_of_votes[226] = 6134
+imdb$number_of_votes[348] = 15966
+imdb$number_of_votes[428] = 8
+imdb$number_of_votes[456] = 2304
+imdb$number_of_votes[487] = 7802
+imdb$number_of_votes[753] = 64701
+imdb$number_of_votes[791] = 75894
+imdb$number_of_votes[1418] = 0
+imdb$number_of_votes[1462] = 185684
+imdb$number_of_votes[1489] = 306331
+imdb$number_of_votes[1633] = 23392
+imdb$number_of_votes[1742] = 95191
+imdb$number_of_votes[2041] = 99801
+imdb$number_of_votes[2194] = 37294
+imdb$number_of_votes[2419] = 77611
+imdb$number_of_votes[2582] = 439627
+
+attach(imdb)
+any(is.na(number_of_votes))
+
+#critic reviews number
+imdb$critic_reviews_number = as.numeric(imdb$critic_reviews_number)
+critics = subset(imdb, is.na(critic_reviews_number))
+imdb$critic_reviews_number[12] = 0
+imdb$critic_reviews_number[48] = 0
+imdb$critic_reviews_number[97] = 0
+imdb$critic_reviews_number[113] = 0
+imdb$critic_reviews_number[244] = 6
+imdb$critic_reviews_number[288] = 0
+imdb$critic_reviews_number[323] = 0
+imdb$critic_reviews_number[1181] = 86
+
+attach(imdb)
+any(is.na(critic_reviews_number))
+
+#duration_number
+imdb$duration_mins = as.numeric(imdb$duration_mins)
+mins = subset(imdb, is.na(duration_mins))
+imdb$duration_mins[2561] = 130
+
+attach(imdb)
+any(is.na(imdb$duration_mins))
+
+
+any(is.na(imdb))
+```
+Step 7: Check for duplicates
+```{r}
+n_occur <- data.frame(table(imdb$movie_id))
+n_occur[n_occur$Freq > 1,]
+```
+A few duplicates. Remove those.
+```{r}
+imdb = imdb[-c(533,2344),]
+imdb = imdb[,-1]
+```
+
+Step 8: Make character columns to numeric
+```{r}
+imdb$user_votes_number = as.numeric(imdb$user_votes_number)
+imdb$movie_budget = as.numeric(imdb$movie_budget)
+imdb$user_reviews_number = as.numeric(imdb$user_reviews_number)
+imdb$actor_2_star_meter = as.numeric(imdb$actor_2_star_meter)
+imdb$actor_3_facebook_likes = as.numeric(imdb$actor_3_facebook_likes)
+imdb$actor_3_star_meter = as.numeric(imdb$actor_3_star_meter)
+imdb$critic_reviews_number = as.numeric(imdb$critic_reviews_number)
+imdb$movie_budget = as.numeric(imdb$movie_budget)
+imdb$movie_facebook_likes = as.numeric(imdb$movie_facebook_likes)
+
+subset(imdb, is.na(critic_reviews_number))
+```
+
+
+Step 9: Looking at Numerical predictors. Intuitively, which ones do I want to test
+duration_mins, aspect_ratio, number_news_articles, actor_123_star_meter, critic_reviews_number, user_votes_number, user_reviews_number, movie_budget
+```{r}
+
+imdb$user_votes_number = as.numeric(imdb$user_votes_number)
+imdb$movie_budget = as.numeric(imdb$movie_budget)
+imdb$user_reviews_number = as.numeric(imdb$user_reviews_number)
+
+
+numericReg = lm(imdb_score~duration_mins+user_votes_number+movie_budget)
+summary(numericReg)
+
+testReg = lm(imdb_score~movie_budget+duration_mins+user_reviews_number+user_votes_number)
+summary(testReg)
+```
+
+Correlation plot between numeric predictors 
+```{r}
+nums <- unlist(lapply(imdb, is.numeric))  
+numericVars = imdb[,nums]
+numericVars = na.omit(numericVars)
+numericVars = numericVars[,-c(13:25)]
+corPlot = cor(numericVars)
+library(corrplot)
+corrplot(corPlot, type = "lower", method = "pie",order = "hclust", 
+         tl.col = "black", tl.srt = 25)
+
+```
+Based off correlation matrix the following variables are significantly correlated: 
+ 1. number_news_articles and number_of_votes
+ 2. actor_2_facebook_likes and cast_total_facebook_likes
+ 3. actor_2_facebook_likes and sum_total_likes 
+ 4. actor_2_facebook_likes and cast_total_facebook_likes
+ 5. actor_1_facebook_likes and sum_total_likes 
+ 6. sum_total_likes and cast_total_facebook_likes 
+ 7. number_of_faces_in_movie_poster and ratio_movie_cast_likes
+ 8. movie_facebook_likes and ratio_movie_cast_likes
+ 9. movie_facebook_likes and number_of_faces_in_movie_poster
+Honourable mentions:
+ 1. imdb_score and duration_mins (0.3)
+ 2. imdb_score and number_of_votes (0.5)
+
+Test model 
+```{r}
+multReg = lm(imdb_score~., data = numericVars)
+summary(multReg)
+```
+
+Test model using step-wise 
+```{r}
+# Step-wise regression
+library(MASS)
+step.model <- stepAIC(multReg, direction = "both", 
+                      trace = FALSE)
+summary(step.model)
+```
