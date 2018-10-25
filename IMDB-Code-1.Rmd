@@ -231,6 +231,7 @@ any(is.na(imdb$duration_mins))
 ```
 
 ```{r}
+imdb[which(is.na(imdb)), ]
 imdb = na.omit(imdb)
 ```
 
@@ -259,13 +260,24 @@ imdb$title = as.character(imdb$title)
 imdb$actor_1_known_for = as.character(imdb$actor_1_known_for)
 imdb$actor_2_known_for = as.character(imdb$actor_2_known_for)
 imdb$actor_3_known_for = as.character(imdb$actor_3_known_for)
+imdb$director = as.character(imdb$director)
+imdb$actor_1_name = as.character(imdb$actor_1_name)
+imdb$actor_2_name = as.character(imdb$actor_2_name)
+imdb$actor_3_name = as.character(imdb$actor_3_name)
+imdb$cinematographer = as.character(imdb$cinematographer)
 ```
+Fix the Color column (has an extra factor)
+```{r}
+which(imdb$color == "http://www.imdb.com/title/tt0160484/?ref_=fn_tt_tt_1")
+imdb$color[which(imdb$color == "http://www.imdb.com/title/tt0160484/?ref_=fn_tt_tt_1")] = "Color"
+```
+
 
 Step 8: Correlation plot between numeric predictors 
 ```{r}
 nums <- unlist(lapply(imdb, is.numeric))  
 numericVars = imdb[,nums]
-numericVars = numericVars[,-c(1, 20:32)]
+numericVars = numericVars[,-c(19:31)]
 corPlot = cor(numericVars)
 library(corrplot)
 corrplot(corPlot, type = "lower", method = "pie",order = "hclust", 
@@ -301,10 +313,51 @@ step.model <- stepAIC(multReg, direction = "both",
 summary(step.model)
 ```
 
+Add in a few categorical variables and test the model
 ```{r}
+modelSet = imdb[,-c(1,3,10,12,13,15,17,19,21,23,50,51)]
+attach(modelSet)
+multReg1 = lm(imdb_score~ ., data= modelSet)
+summary(multReg1)
+```
+
+Bin variables with large number of factors
+```{r}
+# which columns are factors 
 lapply(imdb, class)
-modelSet = imdb[,-c(1,2)]
-allReg = lm(imdb_score~., data= modelSet)
-summary(allReg)
+
+```
+
+```{r}
+table(imdb$director)
+imdb$directorFreq = table(imdb)[as.character(imdb$director)]
+
+library(caTools)
+
+imdb$director_frequency <- table(imdb$director)[imdb$director]
+imdb$director_column10 = ifelse(imdb$director_frequency >= 10, imdb$director, 'Other')
+imdb$director_column10 = as.factor(imdb$director_column)
+attach(imdb)
+
+dirReg10 = glm(imdb_score~director_column10)
+cv.glm(imdb, dirReg, K=54)$delta[1]
+summary(dirReg)
+
+imdb$director_column5 = ifelse(imdb$director_frequency >= 5, imdb$director, 'Other')
+imdb$director_column5 = as.factor(imdb$director_column5)
+attach(imdb)
+
+dirReg5 = glm(imdb_score~director_column5)
+cv.glm(imdb, dirReg5, K=54)$delta[1]
+summary(dirReg)
+
+imdb$director_column3 = ifelse(imdb$director_frequency >= 3, imdb$director, 'Other')
+imdb$director_column3 = as.factor(imdb$director_column3)
+attach(imdb)
+
+dirReg3 = glm(imdb_score~director_column3)
+cv.glm(imdb, dirReg3, K=54)$delta[1]
+summary(dirReg)
+
 ```
 
