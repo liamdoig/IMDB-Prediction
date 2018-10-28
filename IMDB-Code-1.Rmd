@@ -330,9 +330,8 @@ lapply(imdb, class)
 
 ```{r}
 table(imdb$director)
-imdb$directorFreq = table(imdb)[as.character(imdb$director)]
-
 library(caTools)
+library(boot)
 
 imdb$director_frequency <- table(imdb$director)[imdb$director]
 imdb$director_column10 = ifelse(imdb$director_frequency >= 10, imdb$director, 'Other')
@@ -340,8 +339,8 @@ imdb$director_column10 = as.factor(imdb$director_column)
 attach(imdb)
 
 dirReg10 = glm(imdb_score~director_column10)
-cv.glm(imdb, dirReg, K=54)$delta[1]
-summary(dirReg)
+cv.glm(imdb, dirReg10, K=54)$delta[1]
+summary(dirReg10)
 
 imdb$director_column5 = ifelse(imdb$director_frequency >= 5, imdb$director, 'Other')
 imdb$director_column5 = as.factor(imdb$director_column5)
@@ -358,6 +357,101 @@ attach(imdb)
 dirReg3 = glm(imdb_score~director_column3)
 cv.glm(imdb, dirReg3, K=54)$delta[1]
 summary(dirReg)
+
+```
+
+```{r}
+library(dplyr)
+
+# Creating bins for distributor 
+imdb$distributor_freq <- table(imdb$distributor)[imdb$distributor]
+imdb$distributor10 = ifelse(imdb$distributor_freq >= 20, imdb$distributor, 'Other')
+imdb$distributor10 = as.factor(imdb$distributor10)
+attach(imdb)
+relevel(imdb$distributor10, ref = "Other")
+
+distReg10 = glm(imdb_score~distributor10)
+cv.glm(imdb, distReg10, K=46)$delta[1]
+summary(distReg10)
+
+# Creating bins for actor 1
+imdb$actor1_freq <- table(imdb$actor_1_name)[imdb$actor_1_name]
+imdb$actor1_10 = ifelse(imdb$actor1_freq >= 10, imdb$actor_1_name, 'Other')
+imdb$actor1_10 = as.factor(imdb$actor1_10)
+attach(imdb)
+relevel(imdb$actor1_10, ref = "Other")
+
+act1Reg10 = glm(imdb_score~actor1_10)
+cv.glm(imdb, act1Reg10, K=46)$delta[1]
+summary(act1Reg10)
+
+# bins for actor 2
+imdb$actor2_freq <- table(imdb$actor_2_name)[imdb$actor_2_name]
+imdb$actor2_10 = ifelse(imdb$actor2_freq >= 7, imdb$actor_2_name, 'Other')
+imdb$actor2_10 = as.factor(imdb$actor2_10)
+attach(imdb)
+relevel(imdb$actor2_10, ref = "Other")
+
+act2Reg10 = glm(imdb_score~actor2_10)
+cv.glm(imdb, act2Reg10, K=46)$delta[1]
+summary(act2Reg10)
+
+# bins for actor 3
+imdb$actor3_freq <- table(imdb$actor_3_name)[imdb$actor_3_name]
+imdb$actor3_10 = ifelse(imdb$actor3_freq >= 5, imdb$actor_3_name, 'Other')
+imdb$actor3_10 = as.factor(imdb$actor3_10)
+attach(imdb)
+relevel(imdb$actor3_10, ref = "Other")
+
+act3Reg10 = glm(imdb_score~actor3_10)
+cv.glm(imdb, act3Reg10, K=46)$delta[1]
+summary(act3Reg10)
+
+# binning cinematographer 
+imdb$cin_freq <- table(imdb$cinematographer)[imdb$cinematographer]
+imdb$cinematographer10 = ifelse(imdb$cin_freq >= 15, imdb$cinematographer, 'Other')
+imdb$cinematographer10 = as.factor(imdb$cinematographer10)
+attach(imdb)
+relevel(imdb$cinematographer10, ref = "Other")
+
+cinReg10 = glm(imdb_score~cinematographer10)
+cv.glm(imdb, cinReg10, K=46)$delta[1]
+summary(cinReg10)
+
+# binning production co 
+imdb$prod_freq <- table(imdb$production_company)[imdb$production_company]
+imdb$prod10 = ifelse(imdb$prod_freq >= 20, imdb$production_company, 'Other')
+imdb$prod10 = as.factor(imdb$prod10)
+attach(imdb)
+relevel(imdb$prod10, ref = "Other")
+
+prodReg10 = glm(imdb_score~prod10)
+cv.glm(imdb, prodReg10, K=46)$delta[1]
+summary(prodReg10)
+
+# changing aspect ratio to a factor
+imdb$aspect_ratio = as.factor(imdb$aspect_ratio)
+attach(imdb)
+aspectReg10 = lm(imdb_score~aspect_ratio)
+summary(aspectReg10)
+
+```
+
+Testing categorial variables in a model using step-wise 
+```{r}
+
+categoricalVar = imdb[,c(3,6:9,53,57,59,61,63,65,67)]
+catReg = lm(imdb_score~.,data=categoricalVar)
+summary(catReg)
+
+library(MASS)
+catStep <- stepAIC(catReg, direction = "both", 
+                      trace = FALSE)
+summary(catStep)
+```
+
+Combine numeric and categorical variables 
+```{r}
 
 ```
 
