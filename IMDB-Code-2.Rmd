@@ -26,6 +26,37 @@ Step 4: Lets loook at a summary of our data to see what we have in each column. 
 ```{r}
 summary(imdb)
 ```
+Lets plot these missing values
+```{r}
+#Missingness graph
+library(reshape2)
+library(ggplot2)
+library(magrittr)
+ggplot_missing <- function(x){
+  
+  x %>% 
+    is.na %>%
+    melt %>%
+    ggplot(data = .,
+           aes(x = Var2,
+               y = Var1)) +
+    geom_raster(aes(fill = value)) +
+    scale_fill_grey(name = "",
+                    labels = c("Present","Missing")) +
+    theme_minimal() + 
+    theme(axis.text.x  = element_text(angle=90, vjust=0.5)) + 
+    labs(x = "Variables in Dataset with NAs",
+         y = "Rows / observations")
+}
+# Let’s test it out
+ggplot_missing(imdb)
+
+#new DF - columsn with NAs
+#missings <- subset(imdb, select = c(12,14,57,15,19,30,34,37,53,55))
+#ggplot_missing(missings)
+```
+
+
 We have NA Values in:
 distributor = 9
 director = 3
@@ -38,12 +69,13 @@ movie_budget = 95 #removed them
 ratio_movie_cast_likes = 3 
 number_of_votes = 23
 
+
+
 Step 5: Deal with Na Values
 ```{r}
 #1 distributor - googled values
 imdb$distributor = as.character(imdb$distributor)
 distibutor <- subset(imdb, is.na(distributor))
-distibutor
 
 imdb$distributor[77] = "Paramount Pictures"
 imdb$distributor[212] = "United Artists"
@@ -64,7 +96,7 @@ any(is.na(imdb$distributor))
 #2 director - googled values
 imdb$director = as.character(imdb$director)
 directors = subset(imdb, is.na(director))
-directors
+
 imdb$director[217] = "Peter Deluise"
 imdb$director[365] = "Tibor Takics"
 imdb$director[2080] = "Mark Steven Johnson" # this one was the date was also in 2003 not 2015
@@ -77,7 +109,7 @@ any(is.na(imdb$director))
 # 3 prodcution_company - googled values
 imdb$production_company = as.character(imdb$production_company)
 productionCompany = subset(imdb, is.na(production_company))
-productionCompany
+
 
 imdb$production_company[77] = "Indian Paintbrush"
 imdb$production_company[212] = "Selznick International Pictures"
@@ -98,7 +130,7 @@ any(is.na(imdb$production_company))
 #actor_1_star_meter
 imdb$actor_1_star_meter = as.numeric(imdb$actor_1_star_meter)
 actor1star = subset(imdb, is.na(imdb$actor_1_star_meter))
-actor1star
+
 
 imdb$actor_1_star_meter[443] = 2209
 imdb$actor_1_star_meter[664] = 5368
@@ -118,7 +150,7 @@ any(is.na(actor_1_star_meter))
 #number_of_faces_in_movie_poster
 imdb$number_of_faces_in_movie_poster = as.numeric(imdb$number_of_faces_in_movie_poster)
 faces = subset(imdb, is.na(number_of_faces_in_movie_poster))
-faces
+
 
 imdb$number_of_faces_in_movie_poster[274] = 1
 imdb$number_of_faces_in_movie_poster[483] = 0
@@ -136,7 +168,7 @@ any(is.na(number_of_faces_in_movie_poster))
 #movie_budget
 imdb$movie_budget = as.numeric(imdb$movie_budget)
 budget = subset(imdb, is.na(movie_budget))
-budget 
+
 
 imdb$movie_budget[2988] = 1100000
 imdb$movie_budget[2989] = 500000
@@ -158,7 +190,7 @@ any(is.na(movie_budget))
 #ratio_movie_cast_likes
 imdb$ratio_movie_cast_likes = as.numeric(imdb$ratio_movie_cast_likes)
 ratio = subset(imdb, is.na(ratio_movie_cast_likes))
-ratio
+
 
 imdb$ratio_movie_cast_likes[which(is.na(imdb$ratio_movie_cast_likes))] = mean(na.omit(imdb$ratio_movie_cast_likes)) # Replace with the mean
 
@@ -170,7 +202,7 @@ any(is.na(ratio_movie_cast_likes))
 #number_of_votes
 imdb$number_of_votes = as.numeric(imdb$number_of_votes)
 numberofvotes = subset(imdb, is.na(number_of_votes))
-numberofvotes
+
 
 imdb$number_of_votes[11] = 6788
 imdb$number_of_votes[77] = 54489
@@ -203,7 +235,7 @@ any(is.na(number_of_votes))
 #critic reviews number
 imdb$critic_reviews_number = as.numeric(imdb$critic_reviews_number)
 critics = subset(imdb, is.na(critic_reviews_number))
-critics
+
 
 imdb$critic_reviews_number[15] = 0
 imdb$critic_reviews_number[53] = 0
@@ -222,7 +254,6 @@ any(is.na(critic_reviews_number))
 #duration_number
 imdb$duration_mins = as.numeric(imdb$duration_mins)
 mins = subset(imdb, is.na(duration_mins))
-mins 
 
 imdb$duration_mins[2812] = 130
 
@@ -272,6 +303,56 @@ which(imdb$color == "http://www.imdb.com/title/tt0160484/?ref_=fn_tt_tt_1")
 imdb$color[which(imdb$color == "http://www.imdb.com/title/tt0160484/?ref_=fn_tt_tt_1")] = "Color"
 ```
 
+Exploratory Analysis Plots
+```{r}
+################## Distributions #########################
+#For numeric predictors
+par(mfrow=c(3,3)) 
+plot(duration_mins, imdb_score)
+plot(release_year, imdb_score)
+plot(aspect_ratio, imdb_score)
+plot(number_news_articles, imdb_score)
+plot(actor_1_facebook_likes, imdb_score)
+plot(actor_1_star_meter, imdb_score)
+plot(actor_2_facebook_likes, imdb_score)
+plot(actor_2_star_meter, imdb_score)
+plot(actor_3_facebook_likes, imdb_score)
+plot(actor_3_star_meter, imdb_score)
+plot(critic_reviews_number, imdb_score)
+plot(user_votes_number, imdb_score)
+plot(cast_total_facebook_likes, imdb_score)
+plot(number_of_faces_in_movie_poster, imdb_score)
+plot(user_reviews_number, imdb_score)
+plot(movie_budget, imdb_score)
+plot(movie_facebook_likes, imdb_score)
+plot(sum_total_likes, imdb_score)
+plot(ratio_movie_cast_likes, imdb_score)
+plot(movie_meter_IMDB_pro, imdb_score)
+plot(number_of_votes, imdb_score)
+```
+
+
+```{r}
+##### Bar Chart Distributins #####
+par(mfrow=c(2,2))
+#director distribution
+ggplot(data=imdb , aes(x=director) ) + geom_bar(color = "blue") + ggtitle("Director") + theme(axis.title.x=element_blank()) + theme(axis.text.x = element_text(angle=90))
+
+#release month distribution
+ggplot(data=imdb , aes(x=release_month) ) + geom_bar(color = "blue") + ggtitle("Release Months") + theme(axis.title.x=element_blank()) + theme(axis.text.x = element_text(angle=90))
+
+# duration_mins distribution
+ggplot(data=imdb , aes(x=duration_mins) ) + geom_bar(color = "blue") + ggtitle("Movie Durations") + theme(axis.title.x=element_blank()) + theme(axis.text.x = element_text(angle=90))
+
+#country distribution
+ggplot(data=imdb , aes(x=country) ) + geom_bar(color = "blue") + ggtitle("Countries") + theme(axis.title.x=element_blank()) + theme(axis.text.x = element_text(angle=90))
+
+#content rating distribution
+ggplot(data=imdb , aes(x=content_rating) ) + geom_bar(color = "blue") + ggtitle("Content Ratings") + theme(axis.title.x=element_blank()) + theme(axis.text.x = element_text(angle=90))
+
+#distribution of the dependent variable, imdb_score
+ggplot(data=imdb , aes(x=imdb_score) ) + geom_bar(color = "blue") + ggtitle("IMDB Scores") + theme(axis.title.x=element_blank()) + theme(axis.text.x = element_text(angle=90))
+```
 
 Step 8: Correlation plot between numeric predictors 
 ```{r}
@@ -280,7 +361,7 @@ numericVars = imdb[,nums]
 numericVars = numericVars[,-c(19:31)]
 corPlot = cor(numericVars)
 
-install.packages("corrplot")
+
 library(corrplot)
 #TODO: change variables names that appear in corrplot
 corrplot(corPlot, type = "lower", method = "pie",order = "hclust", 
@@ -300,6 +381,126 @@ Based off correlation matrix the following variables are significantly correlate
 Honourable mentions:
  1. imdb_score and duration_mins (0.3)
  2. imdb_score and number_of_votes (0.5)
+
+Outlier Test
+```{r}
+library(car)
+attach(imdb)
+
+Oreg3=lm(imdb_score~duration_mins)
+outlierTest(Oreg3) ###2452
+imdb=imdb[-c(2452),]
+attach(imdb)
+
+Oreg4=lm(imdb_score~aspect_ratio)
+outlierTest(Oreg4) ###1495
+imdb=imdb[-c(1495),]
+attach(imdb)
+
+Oreg5=lm(imdb_score~number_news_articles)
+outlierTest(Oreg5) ##860, 1321
+imdb=imdb[-c(860,1321),] 
+attach(imdb)
+
+Oreg7=lm(imdb_score~director_facebook_likes)
+outlierTest(Oreg7) ##642
+imdb=imdb[-c(642),]
+attach(imdb)
+
+
+Oreg8=lm(imdb_score~actor_1_facebook_likes)
+outlierTest(Oreg8) ##1442
+imdb=imdb[-c(1442),]
+attach(imdb)
+
+Oreg9=lm(imdb_score~actor_1_star_meter)
+outlierTest(Oreg9) ##552
+imdb=imdb[-c(552),]
+attach(imdb)
+
+Oreg10=lm(imdb_score~actor_2_facebook_likes)
+outlierTest(Oreg10) ##2012
+imdb=imdb[-c(2012),]
+attach(imdb)
+
+Oreg11=lm(imdb_score~actor_2_star_meter)
+outlierTest(Oreg11) ##2609
+imdb=imdb[-c(2609),]
+attach(imdb)
+
+Oreg12=lm(imdb_score~actor_3_facebook_likes)
+outlierTest(Oreg12) ##835
+imdb=imdb[-c(835),]
+attach(imdb)
+
+Oreg13=lm(imdb_score~actor_3_star_meter)
+outlierTest(Oreg13) ##1368
+imdb=imdb[-c(1368),]
+attach(imdb)
+
+Oreg14=lm(imdb_score~critic_reviews_number)
+outlierTest(Oreg14) ##1330
+imdb=imdb[-c(1330),]
+attach(imdb)
+
+Oreg15=lm(imdb_score~user_votes_number)
+outlierTest(Oreg15) ##2261
+imdb=imdb[-c(2261),]
+attach(imdb)
+
+Oreg16=lm(imdb_score~cast_total_facebook_likes)
+outlierTest(Oreg16) ##126
+imdb=imdb[-c(126),]
+attach(imdb)
+
+Oreg17=lm(imdb_score~number_of_faces_in_movie_poster)
+outlierTest(Oreg17) ##1645
+imdb=imdb[-c(1645),]
+attach(imdb)
+
+Oreg18=lm(imdb_score~user_reviews_number)
+outlierTest(Oreg18) ##2082
+imdb=imdb[-c(2082),]
+attach(imdb)
+
+Oreg19=lm(imdb_score~movie_budget)
+outlierTest(Oreg19) ##1216
+imdb=imdb[-c(1216),]
+attach(imdb)
+
+Oreg20=lm(imdb_score~movie_facebook_likes)
+outlierTest(Oreg20) ##163
+imdb=imdb[-c(163),]
+attach(imdb)
+
+Oreg21=lm(imdb_score~sum_total_likes)
+outlierTest(Oreg21) ##1575
+imdb=imdb[-c(1575),]
+attach(imdb)
+
+Oreg22=lm(imdb_score~ratio_movie_cast_likes)
+outlierTest(Oreg22) ##375
+imdb=imdb[-c(375),]
+attach(imdb)
+
+Oreg23=lm(imdb_score~movie_meter_IMDB_pro)
+outlierTest(Oreg23) ##2079
+imdb=imdb[-c(2079),]
+attach(imdb)
+
+Oreg24=lm(imdb_score~number_of_votes)
+outlierTest(Oreg24) ##1741
+imdb=imdb[-c(1741),]
+attach(imdb)
+
+```
+Rerun the code to get the numeric dataframe
+```{r}
+nums <- unlist(lapply(imdb, is.numeric))  
+numericVars = imdb[,nums]
+numericVars = numericVars[,-c(19:31)]
+```
+
 
 Step 9: Test model 
 ```{r}
@@ -481,9 +682,11 @@ summary(comboReg)
 predictor2 = c(2,5,34,37,39,42,45,54) # with genre
 predictorSet2 = imdb[,predictor2]
 
+#######
 comboReg2 = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation,data=predictorSet2)
 cv.glm(imdb, comboReg2, K=46)$delta[1] #MSE= 1.7
 summary(comboReg2)
+################ Now .827
 
 predictor3 = c(2,5,54,60) # duration, actor_1, director
 predictorSet3 = imdb[,predictor3]
@@ -495,9 +698,11 @@ summary(comboReg3)
 predictor4 = c(2,5,54,58,60) # duration, actor_1, director, distributor 
 predictorSet4 = imdb[,predictor4]
 
+#########
 comboReg4 = glm(imdb_score~poly(duration_mins,2)+director_column10+actor1_10+distributor10,data=predictorSet4)
 cv.glm(imdb, comboReg4, K=46)$delta[1] #MSE= 0.96
 summary(comboReg4)
+##################### Now .87
 
 predictor5 = c(2,5,58,60) # duration, actor_1, distributor 
 predictorSet5 = imdb[,predictor5]
@@ -540,6 +745,7 @@ predictorSet10 = imdb[,predictor10]
 comboReg10 = glm(imdb_score~poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet10)
 cv.glm(imdb, comboReg10, K=52)$delta[1] #MSE= 0.9469
 summary(comboReg8)
+
 comboReg10.1 = lm(imdb_score~poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet10)
 summary(comboReg10.1) # adj. R^2 
 
@@ -549,13 +755,14 @@ predictorSet11 = imdb[,predictor11]
 comboReg11 = glm(imdb_score~poly(release_year,2)+poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet11)
 cv.glm(imdb, comboReg11, K=52)$delta[1] #MSE= 0.9199
 summary(comboReg11)
-
+################# Now .835
 predictor12 = c(2,4,5,13,43,54,58,60) # release_year, duration, director, drama, actor_1, director_fb_likes, distributor
 predictorSet12 = imdb[,predictor12]
 
 comboReg12 = glm(imdb_score~poly(release_year,2)+poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet12)
 cv.glm(imdb, comboReg12, K=52)$delta[1] #MSE= 0.9179
 summary(comboReg12)
+################# Now .8339
 
 predictor13 = c(2,4,5,13,54,58,60,66) # release_year, duration, director, actor_1, director_fb_likes, distributor, cinematographer
 predictorSet13 = imdb[,predictor13]
@@ -563,5 +770,20 @@ predictorSet13 = imdb[,predictor13]
 comboReg13 = glm(imdb_score~poly(release_year,2)+poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet13)
 cv.glm(imdb, comboReg13, K=52)$delta[1] #MSE= 0.917
 summary(comboReg13)
+
+```
+Best Model
+```{r}
+comboReg2 = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation,data=predictorSet2)
+cv.glm(imdb, comboReg2, K=46)$delta[1] 
+summary(comboReg2)
+################ Now .827
 ```
 
+Tests
+```{r}
+comboS = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama,data=predictorSet2)
+cv.glm(imdb, comboReg2, K=46)$delta[1] 
+summary(comboReg2)
+################ Now .827
+```
