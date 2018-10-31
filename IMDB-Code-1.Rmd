@@ -279,10 +279,7 @@ nums <- unlist(lapply(imdb, is.numeric))
 numericVars = imdb[,nums]
 numericVars = numericVars[,-c(19:31)]
 corPlot = cor(numericVars)
-
-install.packages("corrplot")
 library(corrplot)
-#TODO: change variables names that appear in corrplot
 corrplot(corPlot, type = "lower", method = "pie",order = "hclust", 
          tl.col = "black", tl.srt = 25, tl.cex = 0.7)
 
@@ -331,20 +328,18 @@ lapply(imdb, class)
 
 ```
 
-Creating bins for director variable
 ```{r}
-#table(imdb$director)
-#install.packages("caTools")
+table(imdb$director)
 library(caTools)
 library(boot)
 
 imdb$director_frequency <- table(imdb$director)[imdb$director]
 imdb$director_column10 = ifelse(imdb$director_frequency >= 10, imdb$director, 'Other')
-imdb$director_column10 = as.factor(imdb$director_column10)
+imdb$director_column10 = as.factor(imdb$director_column)
 attach(imdb)
 
 dirReg10 = glm(imdb_score~director_column10)
-cv.glm(imdb, dirReg10, K=46)$delta[1]
+cv.glm(imdb, dirReg10, K=54)$delta[1]
 summary(dirReg10)
 
 imdb$director_column5 = ifelse(imdb$director_frequency >= 5, imdb$director, 'Other')
@@ -352,21 +347,20 @@ imdb$director_column5 = as.factor(imdb$director_column5)
 attach(imdb)
 
 dirReg5 = glm(imdb_score~director_column5)
-cv.glm(imdb, dirReg5, K=46)$delta[1]
-summary(dirReg5)
+cv.glm(imdb, dirReg5, K=54)$delta[1]
+summary(dirReg)
 
 imdb$director_column3 = ifelse(imdb$director_frequency >= 3, imdb$director, 'Other')
 imdb$director_column3 = as.factor(imdb$director_column3)
 attach(imdb)
 
 dirReg3 = glm(imdb_score~director_column3)
-cv.glm(imdb, dirReg3, K=46)$delta[1]
-summary(dirReg3)
+cv.glm(imdb, dirReg3, K=54)$delta[1]
+summary(dirReg)
 
 ```
 
 ```{r}
-#install.packages("dplyr")
 library(dplyr)
 
 # Creating bins for distributor 
@@ -458,15 +452,6 @@ summary(catStep)
 
 Combine numeric and categorical variables 
 ```{r}
-predictors = c(2,5,7,8,9,14,18,29,31,57,59)
-predictorSet = imdb[,predictors]
-
-combinedReg = lm(imdb_score~duration_mins+country+content_rating+aspect_ratio+actor_1_facebook_likes+actor_2_facebook_likes+number_of_faces_in_movie_poster+movie_budget+distributor10+director_column10, data=imdb)
-summary(combinedReg)
-
-comboReg = lm(imdb_score~.,data=predictorSet)
-summary(comboReg)
-
 
 ```
 
