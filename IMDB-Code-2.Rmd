@@ -5,14 +5,14 @@ output: html_notebook
 Step 1: First we want import the IMDB Data from the csv & attach it to make it easier to work with
 
 ```{r}
-DONTUSE = read.csv("data_final.csv")
+imdb = read.csv("data_final.csv")
 attach(imdb)
 ```
 
 Step 2: Get a better look at the data overall
 ```{r}
-head(imdb)
-str(imdb) 
+#head(imdb)
+#str(imdb) 
 #We can see that the data is made up of integers, factors and a dummy variable for genre. Nice!
 #We also have NA values that we need to deal with
 ```
@@ -24,7 +24,7 @@ imdb = imdb[,-c(1,5,28,31,35,58:70)]
 
 Step 4: Lets loook at a summary of our data to see what we have in each column. We can see that we have a bunch of NA values so were going to have to deal with those.
 ```{r}
-summary(imdb)
+#summary(imdb)
 ```
 Lets plot these missing values
 ```{r}
@@ -519,15 +519,15 @@ summary(step.model)
 Add in a few categorical variables and test the model
 ```{r}
 #modelSet = imdb[,-c(1,3,10,12,13,15,17,19,21,23,50,51)]
-attach(modelSet)
-multReg1 = lm(imdb_score~ ., data= modelSet)
-summary(multReg1)
+#attach(modelSet)
+#multReg1 = lm(imdb_score~ ., data= modelSet)
+#summary(multReg1)
 ```
 
 Bin variables with large number of factors
 ```{r}
 # which columns are factors 
-lapply(imdb, class)
+#lapply(imdb, class)
 ```
 
 Creating bins for director variable
@@ -543,24 +543,24 @@ imdb$director_column10 = as.factor(imdb$director_column10)
 attach(imdb)
 
 dirReg10 = glm(imdb_score~director_column10)
-cv.glm(imdb, dirReg10, K=46)$delta[1]
-summary(dirReg10)
+#cv.glm(imdb, dirReg10, K=46)$delta[1]
+#summary(dirReg10)
 
 imdb$director_column5 = ifelse(imdb$director_frequency >= 5, imdb$director, 'Other')
 imdb$director_column5 = as.factor(imdb$director_column5)
 attach(imdb)
 
 dirReg5 = glm(imdb_score~director_column5)
-cv.glm(imdb, dirReg5, K=46)$delta[1]
-summary(dirReg5)
+#cv.glm(imdb, dirReg5, K=46)$delta[1]
+#summary(dirReg5)
 
 imdb$director_column3 = ifelse(imdb$director_frequency >= 3, imdb$director, 'Other')
 imdb$director_column3 = as.factor(imdb$director_column3)
 attach(imdb)
 
 dirReg3 = glm(imdb_score~director_column3)
-cv.glm(imdb, dirReg3, K=46)$delta[1]
-summary(dirReg3)
+#cv.glm(imdb, dirReg3, K=46)$delta[1]
+#summary(dirReg3)
 
 ```
 
@@ -576,8 +576,8 @@ attach(imdb)
 relevel(imdb$distributor10, ref = "Other")
 
 distReg10 = glm(imdb_score~distributor10)
-cv.glm(imdb, distReg10, K=46)$delta[1]
-summary(distReg10)
+#cv.glm(imdb, distReg10, K=46)$delta[1]
+#summary(distReg10)
 
 # Creating bins for actor 1
 imdb$actor1_freq <- table(imdb$actor_1_name)[imdb$actor_1_name]
@@ -587,8 +587,8 @@ attach(imdb)
 relevel(imdb$actor1_10, ref = "Other")
 
 act1Reg10 = glm(imdb_score~actor1_10)
-cv.glm(imdb, act1Reg10, K=46)$delta[1]
-summary(act1Reg10)
+#cv.glm(imdb, act1Reg10, K=46)$delta[1]
+#summary(act1Reg10)
 
 # bins for actor 2
 imdb$actor2_freq <- table(imdb$actor_2_name)[imdb$actor_2_name]
@@ -598,8 +598,8 @@ attach(imdb)
 relevel(imdb$actor2_10, ref = "Other")
 
 act2Reg10 = glm(imdb_score~actor2_10)
-cv.glm(imdb, act2Reg10, K=46)$delta[1]
-summary(act2Reg10)
+#cv.glm(imdb, act2Reg10, K=46)$delta[1]
+#summary(act2Reg10)
 
 # bins for actor 3
 imdb$actor3_freq <- table(imdb$actor_3_name)[imdb$actor_3_name]
@@ -609,8 +609,8 @@ attach(imdb)
 relevel(imdb$actor3_10, ref = "Other")
 
 act3Reg10 = glm(imdb_score~actor3_10)
-cv.glm(imdb, act3Reg10, K=46)$delta[1]
-summary(act3Reg10)
+#cv.glm(imdb, act3Reg10, K=46)$delta[1]
+#summary(act3Reg10)
 
 # binning cinematographer 
 imdb$cin_freq <- table(imdb$cinematographer)[imdb$cinematographer]
@@ -621,8 +621,8 @@ attach(imdb)
 relevel(imdb$cinematographer10, ref = "Other")
 
 cinReg10 = glm(imdb_score~cinematographer10)
-cv.glm(imdb, cinReg10, K=46)$delta[1]
-summary(cinReg10)
+#cv.glm(imdb, cinReg10, K=46)$delta[1]
+#summary(cinReg10)
 
 # binning production co 
 imdb$prod_freq <- table(imdb$production_company)[imdb$production_company]
@@ -632,8 +632,8 @@ attach(imdb)
 relevel(imdb$prod10, ref = "Other")
 
 prodReg10 = glm(imdb_score~prod10)
-cv.glm(imdb, prodReg10, K=46)$delta[1]
-summary(prodReg10)
+#cv.glm(imdb, prodReg10, K=46)$delta[1]
+#summary(prodReg10)
 
 # changing aspect ratio to a factor
 imdb$aspect_ratio = as.factor(imdb$aspect_ratio)
@@ -650,8 +650,9 @@ attach(imdb)
 relevel(imdb$country10, ref = "Other")
 
 countryReg10 = glm(imdb_score~country10)
-cv.glm(imdb, countryReg10, K=46)$delta[1]
-summary(countryReg10)
+#cv.glm(imdb, countryReg10, K=46)$delta[1]
+#summary(countryReg10)
+
 #binning content rating
 imdb$contentRating_freq <- table(imdb$content_rating)[imdb$content_rating]
 imdb$content_rating = as.character(imdb$content_rating)
@@ -666,12 +667,12 @@ Testing categorial variables in a model using step-wise
 
 categoricalVar = imdb[,c(3,6:9,53,57,59,61,63,65,67,69)]
 catReg = lm(imdb_score~.,data=categoricalVar)
-summary(catReg)
+#summary(catReg)
 
 library(MASS)
 catStep <- stepAIC(catReg, direction = "both", 
                       trace = FALSE)
-summary(catStep)
+#summary(catStep)
 ```
 
 Combine numeric and categorical variables 
@@ -682,14 +683,14 @@ predictorSet = imdb[,predictors]
 
 comboReg = glm(imdb_score~poly(duration_mins,2)+director_column10,data=predictorSet)
 cv.glm(imdb, comboReg, K=46)$delta[1] #MSE=0.9057
-summary(comboReg)
+#summary(comboReg)
 
 predictor2 = c(2,5,34,37,39,42,45,54) # with genre
 predictorSet2 = imdb[,predictor2]
 
 comboReg2 = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation,data=predictorSet2)
 cv.glm(imdb, comboReg2, K=46)$delta[1] #MSE=.8266
-summary(comboReg2)
+#summary(comboReg2)
 
 
 predictor3 = c(2,5,54,60) # duration, actor_1, director
@@ -697,7 +698,7 @@ predictorSet3 = imdb[,predictor3]
 
 comboReg3 = glm(imdb_score~poly(duration_mins,2)+director_column10+actor1_10,data=predictorSet3)
 cv.glm(imdb, comboReg3, K=46)$delta[1] #MSE= 0.9031
-summary(comboReg3)
+#summary(comboReg3)
 
 predictor4 = c(2,5,54,58,60) # duration, actor_1, director, distributor 
 predictorSet4 = imdb[,predictor4]
@@ -705,7 +706,7 @@ predictorSet4 = imdb[,predictor4]
 
 comboReg4 = glm(imdb_score~poly(duration_mins,2)+director_column10+actor1_10+distributor10,data=predictorSet4)
 cv.glm(imdb, comboReg4, K=46)$delta[1] #MSE= 0.8775
-summary(comboReg4)
+#summary(comboReg4)
 
 
 predictor5 = c(2,5,58,60) # duration, actor_1, distributor 
@@ -720,35 +721,35 @@ predictorSet6 = imdb[,predictor6]
 
 comboReg6 = glm(imdb_score~poly(duration_mins,2)+poly(number_of_votes,3)+director_column10+actor1_10+distributor10,data=predictorSet6)
 cv.glm(imdb, comboReg6, K=46)$delta[1] #MSE= 0.6942
-summary(comboReg6)
+#summary(comboReg6)
 
 predictor7 = c(2,5,13,50,54,58,60) # duration, director, actor_1, director_fb_likes, distributor, number_of_votes
 predictorSet7 = imdb[,predictor7]
 
 comboReg7 = glm(imdb_score~poly(duration_mins,2)+poly(number_of_votes,3)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet7)
 cv.glm(imdb, comboReg7, K=46)$delta[1] #MSE= 0.6928
-summary(comboReg7)
+#summary(comboReg7)
 
 predictor8 = c(2,5,13,54,58,60) # duration, director, actor_1, director_fb_likes, distributor
 predictorSet8 = imdb[,predictor8]
 
 comboReg8 = glm(imdb_score~poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet8)
 cv.glm(imdb, comboReg8, K=52)$delta[1] #MSE= 0.8625
-summary(comboReg8)
+#summary(comboReg8)
 
 predictor9 = c(2,5,13,54,58,60,68) # duration, director, actor_1, director_fb_likes, distributor, production company
 predictorSet9 = imdb[,predictor9]
 
 comboReg9 = glm(imdb_score~poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10+prod10,data=predictorSet9)
 cv.glm(imdb, comboReg9, K=52)$delta[1] #MSE= 0.8657
-summary(comboReg9)
+#summary(comboReg9)
 
 predictor10 = c(2,5,8,13,54,58,60) # duration, director, actor_1, director_fb_likes, distributor, content_rating
 predictorSet10 = imdb[,predictor10]
 
 comboReg10 = glm(imdb_score~poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet10)
 cv.glm(imdb, comboReg10, K=52)$delta[1] #MSE= 0.8637
-summary(comboReg8)
+#summary(comboReg8)
 
 comboReg10.1 = glm(imdb_score~poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet10)
 summary(comboReg10.1)# adj. R^2 
@@ -766,7 +767,7 @@ predictorSet12 = imdb[,predictor12]
 
 comboReg12 = glm(imdb_score~poly(release_year,2)+poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet12)
 cv.glm(imdb, comboReg12, K=52)$delta[1] #MSE= 0.8366
-summary(comboReg12)
+#summary(comboReg12)
 
 
 predictor13 = c(2,4,5,13,54,58,60,66) # release_year, duration, director, actor_1, director_fb_likes, distributor, cinematographer
@@ -774,17 +775,16 @@ predictorSet13 = imdb[,predictor13]
 
 comboReg13 = glm(imdb_score~poly(release_year,2)+poly(duration_mins,2)+poly(director_facebook_likes,4)+director_column10+actor1_10+distributor10,data=predictorSet13)
 cv.glm(imdb, comboReg13, K=52)$delta[1] #MSE= 0.8345
-summary(comboReg13)
+#summary(comboReg13)
 
 ```
 
 Best Model
 ```{r}
+newest = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+poly(movie_facebook_likes,2)+color+musical+content10, data=imdb)
 
-comboS = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+movie_budget+movie_meter_IMDB_pro+animation+distributor10+number_of_faces_in_movie_poster+poly(ratio_movie_cast_likes,2)+sum_total_likes+poly(movie_facebook_likes,2)+color+actor_1_star_meter+musical+content10, data=imdb)
-
-cv.glm(imdb, comboS, K=46)$delta[1] 
-summary(comboS)
+cv.glm(imdb, newest, K=46)$delta[1] 
+#summary(comboS)
 
 ######## residual plots #########
 #residualPlots(comboS) #We can see that ratio_movie cast likes, movie_fb_likes are non-linear so we made them into polynomials with degree 2
@@ -792,36 +792,47 @@ summary(comboS)
 
 ########## heteroskedasticity #########
 library(car)
+# lm model
+newest.lm = lm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+poly(movie_facebook_likes,2)+color+musical+content10, data=imdb)
 
-comboS.lm = lm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+movie_budget+movie_meter_IMDB_pro+animation+distributor10+number_of_faces_in_movie_poster+poly(ratio_movie_cast_likes,2)+sum_total_likes+poly(movie_facebook_likes,2)+color+actor_1_star_meter+musical+content10, data=imdb)
-ncvTest(comboS.lm)
-plot(predict(comboS), residuals(comboS), col="red")
+#ncvTest
+ncvTest(newest.lm)
+plot(predict(newest.lm), residuals(newest.lm), col="red")
 abline(0,0,lty = 2)
+
 library(sandwich)
 library(lmtest)
 library(plm)
-coeftest(comboS, vcov. = vcovHC(comboS, type = "HC1"))
-summary(comboS.lm)
+#adjusting for hetero
+coeftest(newest.lm, vcov. = vcovHC(newest.lm, type = "HC1"))
+summary(newest.lm)
 
 ########## collinarity test ###########
-install.packages("olsrr")
 library(olsrr)
-ols_coll_diag(comboS) #sum total likes & cast total likes have collinearity so we remove one.. cast total likes.
+ols_coll_diag(newest.lm)
 
 ```
+
+Relevelling factors so Other is the reference/first factor variable 
+```{r}
+relevel(imdb$director_column10, ref = "Other")
+relevel(imdb$distributor10, ref = "Other")
+relevel(imdb$content10, ref = "Other")
+attach(imdb)
+newest.lm = lm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+poly(movie_facebook_likes,2)+color+musical+content10, data=imdb)
+
+library(stargazer)
+stargazer(newest.lm, type="html", title = "Our Best Model", out="./stargazertable.html")
+#summary(newest)
+```
+
 Predictions
 ```{r}
-coef(comboS.lm)[1]+105*coef(comboS.lm)[2]+"Yarrow Cheney"*coef(comboS.lm)
-
-testing123=lm(imdb_score~poly(duration_mins,2),data = imdb)
-summary(testing123)
-
-coef(testing123)[1]+105*coef(testing123)[2]+105*coef(testing123)[3]
-
 ##########################
 newest = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+poly(movie_facebook_likes,2)+color+musical+content10, data=imdb)
-cv.glm(imdb, newest, K=52)$delta[1] #MSE= .72413
-summary(newest)
+
+cv.glm(imdb, newest, K=52)$delta[1] #MSE= ~.72413
+
 
 #Predicting The Grinch 
 predict(newest, data.frame(duration_mins=105, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 0, animation=1,distributor10="Universal Pictures",number_of_faces_in_movie_poster=2, movie_facebook_likes=574,000, color="Color",musical=0,content10="PG")) # Rating = 6.75517
@@ -855,11 +866,11 @@ color="Color",musical=0,content10="PG-13")) #Rating = 6.967006
 
 #Predicting The Welcome to Warwen
 predict(newest, data.frame(duration_mins=133, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 1, animation=0, distributor10="Warner Bros.",number_of_faces_in_movie_poster=1, movie_facebook_likes=1000,
-color="Color",musical=0,content10="PG-13"))
+color="Color",musical=0,content10="PG-13")) # Prediction = 6.774597
 
 #Predicting Ralph Breaks the Internet
-predict(newest, data.frame(duration_mins=112, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 0, animation=1, distributor10="Walt Disney Studios Motion Pictures",number_of_faces_in_movie_poster= 78, movie_facebook_likes=1200,
-color="Color",musical=0,content10="PG")) #Rating = 3.359926
+predict(newest, data.frame(duration_mins=112, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 0, animation=1, distributor10="Walt Disney Studios Motion Pictures",number_of_faces_in_movie_poster= 0, movie_facebook_likes=1200,
+color="Color",musical=0,content10="PG")) #Rating = 6.93055
 #seems like the 78 faces is fucking this up.
 
 #Predicting Second Act
