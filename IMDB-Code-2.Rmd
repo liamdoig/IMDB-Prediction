@@ -664,7 +664,6 @@ relevel(imdb$content10, ref = "Other")
 
 Testing categorial variables in a model using step-wise 
 ```{r}
-
 categoricalVar = imdb[,c(3,6:9,53,57,59,61,63,65,67,69)]
 catReg = lm(imdb_score~.,data=categoricalVar)
 #summary(catReg)
@@ -677,7 +676,6 @@ catStep <- stepAIC(catReg, direction = "both",
 
 Combine numeric and categorical variables 
 ```{r}
-
 predictors = c(2,5,54) # duration, director 
 predictorSet = imdb[,predictors]
 
@@ -781,7 +779,7 @@ cv.glm(imdb, comboReg13, K=52)$delta[1] #MSE= 0.8345
 
 Best Model
 ```{r}
-newest = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+poly(movie_facebook_likes,2)+color+musical+content10, data=imdb)
+newest = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+color+musical+content10, data=imdb)
 
 cv.glm(imdb, newest, K=46)$delta[1] 
 #summary(comboS)
@@ -793,7 +791,7 @@ cv.glm(imdb, newest, K=46)$delta[1]
 ########## heteroskedasticity #########
 library(car)
 # lm model
-newest.lm = lm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+poly(movie_facebook_likes,2)+color+musical+content10, data=imdb)
+newest.lm = lm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+color+musical+content10, data=imdb)
 
 #ncvTest
 ncvTest(newest.lm)
@@ -819,7 +817,8 @@ relevel(imdb$director_column10, ref = "Other")
 relevel(imdb$distributor10, ref = "Other")
 relevel(imdb$content10, ref = "Other")
 attach(imdb)
-newest.lm = lm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+poly(movie_facebook_likes,2)+color+musical+content10, data=imdb)
+newest.lm = lm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+color+musical+content10, data=imdb)
+summary(newest.lm)
 
 library(stargazer)
 stargazer(newest.lm, type="html", title = "Our Best Model", out="./stargazertable.html")
@@ -829,58 +828,60 @@ stargazer(newest.lm, type="html", title = "Our Best Model", out="./stargazertabl
 Predictions
 ```{r}
 ##########################
-newest = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+poly(movie_facebook_likes,2)+color+musical+content10, data=imdb)
+newest = glm(imdb_score~poly(duration_mins,2)+director_column10+action+thriller+romance+horror+drama+animation+distributor10+number_of_faces_in_movie_poster+color+musical+content10, data=imdb)
 
-cv.glm(imdb, newest, K=52)$delta[1] #MSE= ~.72413
-
+cv.glm(imdb, newest, K=52)$delta[1] #MSE= ~.781
 
 #Predicting The Grinch 
-predict(newest, data.frame(duration_mins=105, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 0, animation=1,distributor10="Universal Pictures",number_of_faces_in_movie_poster=2, movie_facebook_likes=574,000, color="Color",musical=0,content10="PG")) # Rating = 6.75517
+predict(newest, data.frame(duration_mins=105, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 0, animation=1,distributor10="Universal Pictures",number_of_faces_in_movie_poster=2, color="Color",musical=0,content10="PG")) # Rating = 6.92818
 
 #Predicting Postcards From London
-predict(newest, data.frame(duration_mins=90, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 1, animation=0, distributor10="Other",number_of_faces_in_movie_poster=5, movie_facebook_likes=0,color="Color",musical=0,content10="Other")) # Rating = 6.4542
+predict(newest, data.frame(duration_mins=90, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 1, animation=0, distributor10="Other",number_of_faces_in_movie_poster=5, color="Color",musical=0,content10="Other")) # Rating = 6.440592
 
 #Predicting The Long Dumb Road
-predict(newest, data.frame(duration_mins=90, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama =0, animation=0, distributor10="Universal Pictures",number_of_faces_in_movie_poster=2, movie_facebook_likes=111,
-color="Color",musical=0,content10="R")) #Rating = 6.16885
+predict(newest, data.frame(duration_mins=90, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama =0, animation=0, distributor10="Universal Pictures",number_of_faces_in_movie_poster=2,
+color="Color",musical=0,content10="R")) #Rating = 6.248
 
 #Predicting Instant Family
-predict(newest, data.frame(duration_mins=90, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama =0, animation=0, distributor10="Paramount Pictures",number_of_faces_in_movie_poster=5, movie_facebook_likes=35000,
-color="Color",musical=0,content10="PG-13")) # Rating = 6.356787
+predict(newest, data.frame(duration_mins=90, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama =0, animation=0, distributor10="Paramount Pictures",number_of_faces_in_movie_poster=5,
+color="Color",musical=0,content10="PG-13")) # Rating = 5.876
 
 #Predicting Crimes of Grindelwald
-predict(newest, data.frame(duration_mins=134, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 1, animation=0, distributor10="Warner Bros.",number_of_faces_in_movie_poster=10, movie_facebook_likes=6500,
-color="Color",musical=0,content10="PG-13")) #Rating = 6.518825
+predict(newest, data.frame(duration_mins=134, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 1, animation=0, distributor10="Warner Bros.",number_of_faces_in_movie_poster=10,
+color="Color",musical=0,content10="PG-13")) #Rating = 6.68
 
 #Predicting The Clovehitch Killer
-predict(newest, data.frame(duration_mins=110, director_column10="Other", action = 0, thriller=0,romance=0,horror=1,drama = 1, animation=0, distributor10="Other",number_of_faces_in_movie_poster=1, movie_facebook_likes=0,
-color="Color",musical=0,content10="Other")) #Rating = 6.59145
+predict(newest, data.frame(duration_mins=110, director_column10="Other", action = 0, thriller=0,romance=0,horror=1,drama = 1, animation=0, distributor10="Other",number_of_faces_in_movie_poster=1,
+color="Color",musical=0,content10="Other")) #Rating = 6.661
 
 #Predicting Robin Hood
-predict(newest, data.frame(duration_mins=116, director_column10="Other", action = 1, thriller=0,romance=0,horror=1,drama = 0, animation=0, distributor10="Lionsgate",number_of_faces_in_movie_poster=6, movie_facebook_likes=45140,
-color="Color",musical=0,content10="PG-13")) #Rating = 5.87064
+predict(newest, data.frame(duration_mins=116, director_column10="Other", action = 1, thriller=0,romance=0,horror=0,drama = 0, animation=0, distributor10="Lionsgate",number_of_faces_in_movie_poster=6,
+color="Color",musical=0,content10="PG-13")) #Rating = 5.879733
 
 #Predicting Creed 2
-predict(newest, data.frame(duration_mins=90, director_column10="Robert Zemeckis", action = 0, thriller=0,romance=0,horror=0,drama = 1, animation=0, distributor10="Universal Pictures",number_of_faces_in_movie_poster=1, movie_facebook_likes=28000,
-color="Color",musical=0,content10="PG-13")) #Rating = 6.967006
+predict(newest, data.frame(duration_mins=90, director_column10="Robert Zemeckis", action = 0, thriller=0,romance=0,horror=0,drama = 1, animation=0, distributor10="Universal Pictures",number_of_faces_in_movie_poster=1,
+color="Color",musical=0,content10="PG-13")) #Rating = 6.765665
 
 #Predicting The Welcome to Warwen
-predict(newest, data.frame(duration_mins=133, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 1, animation=0, distributor10="Warner Bros.",number_of_faces_in_movie_poster=1, movie_facebook_likes=1000,
-color="Color",musical=0,content10="PG-13")) # Prediction = 6.774597
+predict(newest, data.frame(duration_mins=133, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 1, animation=0, distributor10="Warner Bros.",number_of_faces_in_movie_poster=1,
+color="Color",musical=0,content10="PG-13")) # Prediction = 7.040479
 
 #Predicting Ralph Breaks the Internet
-predict(newest, data.frame(duration_mins=112, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 0, animation=1, distributor10="Walt Disney Studios Motion Pictures",number_of_faces_in_movie_poster= 0, movie_facebook_likes=1200,
-color="Color",musical=0,content10="PG")) #Rating = 6.93055
+predict(newest, data.frame(duration_mins=112, director_column10="Other", action = 0, thriller=0,romance=0,horror=0,drama = 0, animation=1, distributor10="Walt Disney Studios Motion Pictures",number_of_faces_in_movie_poster= 0,
+color="Color",musical=0,content10="PG")) #Rating = 7.505993
 #seems like the 78 faces is fucking this up.
 
 #Predicting Second Act
-predict(newest, data.frame(duration_mins=105, director_column10= "Other", action = 0, thriller=0,romance=1,horror=0,drama = 0, animation=0, distributor10="Other",number_of_faces_in_movie_poster= 1, movie_facebook_likes=47000,color="Color",musical=0,content10="PG-13")) #Rating = 6.707748
+predict(newest, data.frame(duration_mins=105, director_column10= "Other", action = 0, thriller=0,romance=1,horror=0,drama = 0, animation=0, distributor10="Other",number_of_faces_in_movie_poster= 1, color="Color",musical=0,content10="PG-13")) #Rating = 6.108134
 
 #Predicting Becoming Astrid
-predict(newest, data.frame(duration_mins=124, director_column10="Other", action = 0, thriller=0,romance=0,horror=0, drama = 1, animation=0, distributor10="Other",number_of_faces_in_movie_poster=2, movie_facebook_likes=0,
-color="Color",musical=0,content10="Other")) #Rating = 7.10222
+predict(newest, data.frame(duration_mins=124, director_column10="Other", action = 0, thriller=0,romance=0,horror=0, drama = 1, animation=0, distributor10="Other",number_of_faces_in_movie_poster=2,
+color="Color",musical=0,content10="Other")) #Rating = 7.220898
 
+```
 
-
+Residual Plots for "newest" model 
+```{r}
+residualPlots(newest)
 ```
 
